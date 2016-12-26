@@ -39,3 +39,5 @@ android/keystores/debug.keystore
 # VS code
 .vscode
 tsconfig.json
+
+yarn.lock

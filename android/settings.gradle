@@ -1,0 +1,3 @@
+rootProject.name = 'ranking'
+
+include ':app'
