@@ -1,0 +1,22 @@
+{
+  "name": "react-native-grading",
+  "version": "0.0.1",
+  "description": "react-native component for grading ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tinysymphony/react-native-grading.git"
+  },
+  "keywords": [
+    "grading"
+  ],
+  "author": "TinySymphony",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tinysymphony/react-native-grading/issues"
+  },
+  "homepage": "https://github.com/Tinysymphony/react-native-grading#readme"
+}
