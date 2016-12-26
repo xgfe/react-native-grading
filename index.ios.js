@@ -4,7 +4,4 @@
  * @flow
  */
 
-import {AppRegistry} from 'react-native';
-import Ranking from './Ranking';
-
-AppRegistry.registerComponent('ranking', () => Ranking);
+require('./index.android.js');

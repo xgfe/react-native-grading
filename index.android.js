@@ -5,14 +5,18 @@
  */
 
 import React, {Component} from 'react';
-import {AppRegistry, StyleSheet} from 'react-native';
+import {
+  AppRegistry,
+  StyleSheet,
+  View,
+  Text
+} from 'react-native';
 import Ranking from './Ranking';
 
 class ranking extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
     };
   }
   render() {
@@ -42,4 +46,4 @@ const styles = StyleSheet.create({
   }
 });
 
-AppRegistry.registerComponent('ranking', () => Ranking);
+AppRegistry.registerComponent('ranking', () => ranking);
