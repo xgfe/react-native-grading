@@ -1,22 +1,22 @@
 {
-  "name": "react-native-grading",
+  "name": "react-native-ranking",
   "version": "0.0.1",
-  "description": "react-native component for grading ",
+  "description": "react-native component for ranking",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tinysymphony/react-native-grading.git"
+    "url": "git+https://github.com/Tinysymphony/react-native-ranking.git"
   },
   "keywords": [
-    "grading"
+    "ranking"
   ],
   "author": "TinySymphony",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Tinysymphony/react-native-grading/issues"
+    "url": "https://github.com/Tinysymphony/react-native-ranking/issues"
   },
-  "homepage": "https://github.com/Tinysymphony/react-native-grading#readme"
+  "homepage": "https://github.com/Tinysymphony/react-native-ranking#readme"
 }

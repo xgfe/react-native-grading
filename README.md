@@ -1,1 +1,1 @@
-## react-native-grading
+## react-native-ranking
