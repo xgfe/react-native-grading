@@ -1,20 +1,28 @@
 import React, {
   Component,
-  PropTypes,
-  ART
+  PropTypes
 } from 'react';
 import {
+  ART,
   Text,
   View,
-  TouchableHightlight
+  TouchableHighlight
 } from 'react-native';
-import {default as styles} from './RankingStyle'
+import {default as styles} from './RankingStyle';
+
+const {
+  Shape,
+  Group,
+  Surface,
+  Rectangle
+} = ART;
 
 class Ranking extends Component {
   constructor(props) {
     super(props);
     this.state = {
     };
+
     this.noop = this.noop.bind(this);
   }
   noop() {
@@ -26,28 +34,62 @@ class Ranking extends Component {
   renderStar() {
 
   }
-
   renderBoard() {
-
-  }
-
-  render() {
+    const {
+      score,
+      num
+    } = this.props;
     return (
-      <TouchableHightlight
-        onPress={this.noop}
-        style={styles.container}
-      >
-        <View style={styles.view}>
-          <Text style={styles.text}>EX1</Text>
+      <View style={styles.board}>
+
+        <View style={styles.boardScoreWp}>
+          <Text style={styles.boardScore}>{score}</Text>
         </View>
-      </TouchableHightlight>
+        <Text style={styles.boardNum}>{num}</Text>
+        <View style={styles.boardStars}>
+          <Surface width={200} height={100}>
+            <Group x={0} y={0}>
+              <Shape
+                d={10}
+                stroke="#000"
+                strokeWidth={5}
+              />
+            </Group>
+          </Surface>
+        </View>
+      </View>
     );
   }
-};
+  render() {
+    const {
+      mode
+    } = this.props;
+
+    let rankingView;
+    if (mode === 'board') {
+      rankingView = this.renderBoard();
+    } else if (mode === 'arcs') {
+      rankingView = this.renderArc();
+    } else {
+      rankingView = this.renderStar();
+    }
+
+    return (
+      <TouchableHighlight>
+        {rankingView}
+      </TouchableHighlight>
+    );
+  }
+}
 
 Ranking.defaultProps = {
   mode: 'board',
   enable: false,
+  size: 'md',
+  score: 0,
+  num: 0,
+  onScore: () => {},
+  name: '',
   activeColor: '#fa952f',
   defaultColor: '#e9e9e9',
   fontColor: '#333'
@@ -59,6 +101,7 @@ Ranking.propTypes = {
   size: PropTypes.oneOf(['sm', 'md', 'lg']),
   score: PropTypes.number,
   onScore: PropTypes.func,
+  num: PropTypes.number,
   name: PropTypes.string,
   activeColor: PropTypes.string,
   defaultColor: PropTypes.string,

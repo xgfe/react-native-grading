@@ -24,10 +24,9 @@ class ranking extends Component {
       <View style={styles.container}>
         <Text style={styles.welcome}>Examples about react-native-ranking</Text>
         <Ranking
-          mode="circle"
         />
       </View>
-    )
+    );
   }
 }
 
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF'
   },
   welcome: {
-    fontSize: 30,
+    fontSize: 20,
     textAlign: 'center',
     margin: 10,
     color: '#333333'
