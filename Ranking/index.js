@@ -20,6 +20,23 @@ const {
   Group,
   Surface
 } = ART;
+function polarToCartesian (centerX, centerY, radius, angleInDegrees) {
+  var angleInRadians = (angleInDegrees + 90) * Math.PI / 180.0;
+  return {
+    x: centerX + (radius * Math.cos(angleInRadians)),
+    y: centerY - (radius * Math.sin(angleInRadians))
+  };
+}
+
+function generateArcPath (x, y, radius, startAngle, endAngle) {
+  var start = polarToCartesian(x, y, radius, startAngle);
+  var end = polarToCartesian(x, y, radius, endAngle);
+  var arcSweep = endAngle - startAngle <= 180 ? '0' : '1';
+  return [
+    'M', start.x, start.y,
+    'A', radius, radius, 0, arcSweep, 0, end.x, end.y
+  ].join(' ');
+}
 
 class Ranking extends Component {
   constructor(props) {
@@ -39,21 +56,17 @@ class Ranking extends Component {
       color = ACTIVE_COLOR
     } = options || {};
     return (
-      <Surface width={200} height={200}>
-        <Group x={100} y={0}>
+      <Surface width={68} height={68}>
+        <Group x={0} y={0}>
           <Shape
             stroke={DEFAULT_COLOR}
-            strokeWidth={5}
-            d={`
-              M60 60
-              A 45 45, 0, 1, 0, 60 125`}
+            strokeWidth={4}
+            d={generateArcPath(34, 34, 30, 0.01, 360)}
             />
           <Shape
             stroke={color}
-            strokeWidth={5}
-            d={`
-              M60 60
-              A 45 45, 0, 0, 1, 60 125`}
+            strokeWidth={4}
+            d={generateArcPath(34, 34, 30, 0, 250)}
             />
         </Group>
       </Surface>
