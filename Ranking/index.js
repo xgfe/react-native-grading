@@ -9,12 +9,16 @@ import {
   TouchableHighlight
 } from 'react-native';
 import {default as styles} from './RankingStyle';
+import {COLOR, MODE, SIZE} from './RankingConstants';
+
+const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR} = COLOR;
+const {BOARD, SMILES, ARCS, STARS} = MODE;
+const {SMALL, MIDDLE, LARGE} = SIZE;
 
 const {
   Shape,
   Group,
-  Surface,
-  Rectangle
+  Surface
 } = ART;
 
 class Ranking extends Component {
@@ -22,40 +26,96 @@ class Ranking extends Component {
     super(props);
     this.state = {
     };
-
     this.noop = this.noop.bind(this);
   }
   noop() {
     return true;
   }
-  renderArc() {
-
+  drawStar(options) {
+    const {
+      color = '#fa952f',
+      scale = 1
+    } = options || {};
+    return (
+      <Surface width={40 * scale} height={40 * scale}>
+        <Group x={20 * scale} y={20 * scale}>
+          <Shape
+              d={`M 0.000 10.000
+                  L 11.756 16.180
+                  L 9.511 3.090
+                  L 19.021 -6.180
+                  L 5.878 -8.090
+                  L 0.000 -20.000
+                  L -5.878 -8.090
+                  L -19.021 -6.180
+                  L -9.511 3.090
+                  L -11.756 16.180
+                  L 0.000 10.000`}
+              fill={color}
+              scale={scale}
+            />
+        </Group>
+      </Surface>
+    );
   }
-  renderStar() {
-
+  parseNumber(num) {
+    let arr = [];
+    while (num > 0) {
+      arr.unshift(num % 1000);
+      num = ~~(num / 1000);
+    }
+    return arr.join();
+  }
+  renderArcs() {
+  }
+  renderStars() {
+    const {
+      score,
+      scoreBase,
+      size,
+      activeColor,
+      defaultColor
+    } = this.props;
+    let arr = [];
+    let base = scoreBase;
+    let scale = 1;
+    while (base--) { arr.push(1); }
+    if (size === MIDDLE) scale = 2;
+    else if (size === LARGE) scale = 3;
+    let activeStar = this.drawStar({scale: 0.3 * scale, color: activeColor});
+    let defaultStar = this.drawStar({scale: 0.3 * scale, color: defaultColor});
+    return (
+      <View style={styles.stars}>
+        {arr.map((item, index) =>
+          score >= index + 1 ? activeStar : defaultStar
+        )}
+      </View>
+    );
+  }
+  renderSmiles() {
   }
   renderBoard() {
     const {
       score,
-      num
+      num,
+      activeColor,
+      defaultColor,
+      fontColor
     } = this.props;
+    const BASE = 5;
+    let activeStar = this.drawStar({scale: 0.3, color: activeColor});
+    let defaultStar = this.drawStar({scale: 0.3, color: defaultColor});
+    let arr = [1, 1, 1, 1, 1];
     return (
       <View style={styles.board}>
-
         <View style={styles.boardScoreWp}>
-          <Text style={styles.boardScore}>{score}</Text>
+          <Text style={[styles.boardScore, {color: activeColor}]}>{(score % BASE).toFixed(1)}</Text>
         </View>
-        <Text style={styles.boardNum}>{num}</Text>
+        <Text style={[styles.boardNum, {color: fontColor}]}>{num < 1000000 ? this.parseNumber(num) : '100w+'}</Text>
         <View style={styles.boardStars}>
-          <Surface width={200} height={100}>
-            <Group x={0} y={0}>
-              <Shape
-                d={10}
-                stroke="#000"
-                strokeWidth={5}
-              />
-            </Group>
-          </Surface>
+          {arr.map((item, index) =>
+            score >= index + 1 ? activeStar : defaultStar
+          )}
         </View>
       </View>
     );
@@ -64,16 +124,16 @@ class Ranking extends Component {
     const {
       mode
     } = this.props;
-
     let rankingView;
-    if (mode === 'board') {
+    if (mode === BOARD) {
       rankingView = this.renderBoard();
-    } else if (mode === 'arcs') {
-      rankingView = this.renderArc();
+    } else if (mode === ARCS) {
+      rankingView = this.renderArcs();
+    } else if (mode === STARS){
+      rankingView = this.renderStars();
     } else {
-      rankingView = this.renderStar();
+      rankingView = this.renderSmiles();
     }
-
     return (
       <TouchableHighlight>
         {rankingView}
@@ -86,20 +146,22 @@ Ranking.defaultProps = {
   mode: 'board',
   enable: false,
   size: 'md',
-  score: 0,
   num: 0,
+  score: 0,
+  scoreBase: 5,
   onScore: () => {},
   name: '',
-  activeColor: '#fa952f',
-  defaultColor: '#e9e9e9',
-  fontColor: '#333'
+  activeColor: ACTIVE_COLOR,
+  defaultColor: DEFAULT_COLOR,
+  fontColor: FONT_COLOR
 };
 
 Ranking.propTypes = {
-  mode: PropTypes.oneOf(['board', 'star', 'smile', 'arcs']),
+  mode: PropTypes.oneOf([BOARD, ARCS, SMILES, STARS]),
   enable: PropTypes.bool,
-  size: PropTypes.oneOf(['sm', 'md', 'lg']),
+  size: PropTypes.oneOf([SMALL, MIDDLE, LARGE]),
   score: PropTypes.number,
+  scoreBase: PropTypes.number,
   onScore: PropTypes.func,
   num: PropTypes.number,
   name: PropTypes.string,
