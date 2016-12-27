@@ -34,7 +34,9 @@ class ranking extends Component {
           <Ranking mode="stars" score={4.45} scoreBase={8} defaultColor="#dad9b8"/>
           <Ranking mode="stars" size="lg" score={6.2} scoreBase={10} activeColor="#e4525e"/>
         </View>
-        <View style={styles.arcsRanking}></View>
+        <View style={styles.arcsRanking}>
+          <Ranking mode="arcs" score={6.2} scoreBase={10}/>
+        </View>
         <View style={styles.simlesRanking}></View>
       </View>
     );

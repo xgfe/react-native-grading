@@ -31,5 +31,9 @@ export default StyleSheet.create({
   stars: {
     flexDirection: 'row',
     justifyContent: 'center'
+  },
+  arcs: {
+    flexDirection: 'row',
+    justifyContent: 'center'
   }
 });

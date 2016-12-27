@@ -31,28 +31,56 @@ class Ranking extends Component {
   noop() {
     return true;
   }
+  drawSmile() {
+
+  }
+  drawArc(options) {
+    const {
+      color = ACTIVE_COLOR
+    } = options || {};
+    return (
+      <Surface width={200} height={200}>
+        <Group x={100} y={0}>
+          <Shape
+            stroke={DEFAULT_COLOR}
+            strokeWidth={5}
+            d={`
+              M60 60
+              A 45 45, 0, 1, 0, 60 125`}
+            />
+          <Shape
+            stroke={color}
+            strokeWidth={5}
+            d={`
+              M60 60
+              A 45 45, 0, 0, 1, 60 125`}
+            />
+        </Group>
+      </Surface>
+    );
+  }
   drawStar(options) {
     const {
-      color = '#fa952f',
+      color = ACTIVE_COLOR,
       scale = 1
     } = options || {};
     return (
       <Surface width={40 * scale} height={40 * scale}>
         <Group x={20 * scale} y={20 * scale}>
           <Shape
-              d={`M 0.000 10.000
-                  L 11.756 16.180
-                  L 9.511 3.090
-                  L 19.021 -6.180
-                  L 5.878 -8.090
-                  L 0.000 -20.000
-                  L -5.878 -8.090
-                  L -19.021 -6.180
-                  L -9.511 3.090
-                  L -11.756 16.180
-                  L 0.000 10.000`}
-              fill={color}
-              scale={scale}
+            fill={color}
+            scale={scale}
+            d={`M 0.000 10.000
+                L 11.756 16.180
+                L 9.511 3.090
+                L 19.021 -6.180
+                L 5.878 -8.090
+                L 0.000 -20.000
+                L -5.878 -8.090
+                L -19.021 -6.180
+                L -9.511 3.090
+                L -11.756 16.180
+                L 0.000 10.000`}
             />
         </Group>
       </Surface>
@@ -67,6 +95,11 @@ class Ranking extends Component {
     return arr.join();
   }
   renderArcs() {
+    return (
+      <View style={styles.arcs}>
+        {this.drawArc()}
+      </View>
+    );
   }
   renderStars() {
     const {

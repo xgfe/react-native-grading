@@ -8,7 +8,7 @@ export const MODE = {
   BOARD: 'board',
   STARS: 'stars',
   SMILES: 'smiles',
-  ARCS: 'arc'
+  ARCS: 'arcs'
 };
 
 export const SIZE = {
