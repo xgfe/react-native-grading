@@ -9,6 +9,7 @@ import {
   AppRegistry,
   StyleSheet,
   View,
+  ScrollView,
   Text
 } from 'react-native';
 import Ranking from './Ranking';
@@ -21,7 +22,7 @@ class ranking extends Component {
   }
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <Text style={styles.welcome}>Examples about react-native-ranking</Text>
         <View style={styles.boardRanking}>
           <Ranking score={3.0} num={234} defaultColor="#9ce0d6"/>
@@ -30,23 +31,26 @@ class ranking extends Component {
           <Ranking score={4.45} num={234234523478}/>
         </View>
         <View style={styles.starsRanking}>
-          <Ranking mode="stars" size="sm" score={4.45}/>
-          <Ranking mode="stars" score={4.45} scoreBase={8} defaultColor="#dad9b8"/>
-          <Ranking mode="stars" size="lg" score={6.2} scoreBase={10} activeColor="#e4525e"/>
+          <Ranking mode="stars" score={4.45}/>
+          <Ranking mode="stars" scale={2} score={4.45} scoreBase={8} defaultColor="#dad9b8"/>
+          <Ranking mode="stars" scale={2.4} score={6.2} scoreBase={10} activeColor="#e4525e"/>
         </View>
         <View style={styles.arcsRanking}>
-          <Ranking mode="arcs" score={6.2} scoreBase={10}/>
+          <Ranking mode="arcs" score={6.2} scoreBase={10} name="市占比"/>
+          <Ranking mode="arcs" score={4.2} scoreBase={6} activeColor="#2bb8aa" scale={1.2} name="环比增长"/>
+          <Ranking mode="arcs" score={1.2} scale={1.6} name="同比增长"/>
         </View>
-        <View style={styles.simlesRanking}></View>
-      </View>
+        <View style={styles.simlesRanking}>
+          <Ranking mode="smiles"/>
+          <Ranking mode="smiles" scale={1.4} activeColor="#d23f2b" isLike={false}/>
+        </View>
+      </ScrollView>
     );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#F5FCFF'
   },
   welcome: {
@@ -65,12 +69,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around'
   },
   arcsRanking: {
-    flex: 1,
+    marginTop: 20,
     justifyContent: 'space-around'
   },
   simlesRanking: {
-    flex: 1,
-    justifyContent: 'space-around'
+    marginTop: 20,
+    alignItems: 'center'
   }
 });
 

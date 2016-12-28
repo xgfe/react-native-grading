@@ -34,6 +34,22 @@ export default StyleSheet.create({
   },
   arcs: {
     flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-start'
+  },
+  arcContainer: {
+    alignItems: 'center'
+  },
+  arc: {
+    alignItems: 'center',
     justifyContent: 'center'
+  },
+  arcScore: {
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  smiles: {
+    flexDirection: 'row',
+    justifyContent: 'space-around'
   }
 });

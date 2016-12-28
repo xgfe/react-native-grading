@@ -9,17 +9,17 @@ import {
   TouchableHighlight
 } from 'react-native';
 import {default as styles} from './RankingStyle';
-import {COLOR, MODE, SIZE} from './RankingConstants';
+import {COLOR, MODE, SVG} from './RankingConstants';
 
 const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR} = COLOR;
 const {BOARD, SMILES, ARCS, STARS} = MODE;
-const {SMALL, MIDDLE, LARGE} = SIZE;
 
 const {
   Shape,
   Group,
   Surface
 } = ART;
+
 function polarToCartesian (centerX, centerY, radius, angleInDegrees) {
   var angleInRadians = (angleInDegrees + 90) * Math.PI / 180.0;
   return {
@@ -43,33 +43,75 @@ class Ranking extends Component {
     super(props);
     this.state = {
     };
-    this.noop = this.noop.bind(this);
   }
   noop() {
     return true;
   }
-  drawSmile() {
-
+  drawSmile(options) {
+    const {
+      like,
+      active,
+      scale = 1,
+      activeColor = ACTIVE_COLOR,
+      defaultColor = DEFAULT_COLOR
+    } = options || {};
+    return (
+      <Surface width={50 * scale} height={50 * scale}>
+        <Group x={5 * scale} y={5 * scale}>
+          <Shape
+            scale={40 / 1024 * scale}
+            fill={active ? activeColor : defaultColor}
+            d={like ? SVG.HAPPY : SVG.SAD}/>
+        </Group>
+      </Surface>
+    );
   }
   drawArc(options) {
     const {
-      color = ACTIVE_COLOR
+      activeColor = ACTIVE_COLOR,
+      score = 2,
+      scoreBase = 10,
+      scale = 1,
+      fontColor = FONT_COLOR,
+      name = ''
     } = options || {};
+    const angle = score / scoreBase * 360;
+    let fontStyle = {
+      fontSize: 20 * scale,
+      lineHeight: 20 * scale,
+      marginTop: -44 * scale,
+      color: fontColor
+    };
+    let nameStyle = {
+      fontSize: 16 * scale,
+      marginTop: 24 * scale,
+      color: fontColor
+    };
     return (
-      <Surface width={68} height={68}>
-        <Group x={0} y={0}>
-          <Shape
-            stroke={DEFAULT_COLOR}
-            strokeWidth={4}
-            d={generateArcPath(34, 34, 30, 0.01, 360)}
-            />
-          <Shape
-            stroke={color}
-            strokeWidth={4}
-            d={generateArcPath(34, 34, 30, 0, 250)}
-            />
-        </Group>
-      </Surface>
+      <View style={[styles.arcContainer]}>
+        <View style={[styles.arc]}>
+          <Surface width={68 * scale} height={68 * scale}>
+            <Group x={0} y={0}>
+              <Shape
+                scale={scale}
+                stroke={DEFAULT_COLOR}
+                strokeWidth={4}
+                d={generateArcPath(34, 34, 30, 0.01, 360)}
+                />
+              {angle ?
+                <Shape
+                  scale={scale}
+                  stroke={activeColor}
+                  strokeWidth={4}
+                  d={generateArcPath(34, 34, 30, 0, angle)}
+                  /> : undefined
+              }
+            </Group>
+          </Surface>
+        </View>
+        <Text style={[styles.arcScore, fontStyle]}>{(score % scoreBase).toFixed(1)}</Text>
+        <Text style={nameStyle}>{name}</Text>
+      </View>
     );
   }
   drawStar(options) {
@@ -110,7 +152,7 @@ class Ranking extends Component {
   renderArcs() {
     return (
       <View style={styles.arcs}>
-        {this.drawArc()}
+        {this.drawArc({...this.props})}
       </View>
     );
   }
@@ -118,16 +160,13 @@ class Ranking extends Component {
     const {
       score,
       scoreBase,
-      size,
+      scale,
       activeColor,
       defaultColor
     } = this.props;
     let arr = [];
     let base = scoreBase;
-    let scale = 1;
     while (base--) { arr.push(1); }
-    if (size === MIDDLE) scale = 2;
-    else if (size === LARGE) scale = 3;
     let activeStar = this.drawStar({scale: 0.3 * scale, color: activeColor});
     let defaultStar = this.drawStar({scale: 0.3 * scale, color: defaultColor});
     return (
@@ -139,6 +178,13 @@ class Ranking extends Component {
     );
   }
   renderSmiles() {
+    const {isLike} = this.props;
+    return (
+      <View style={styles.smiles}>
+        {this.drawSmile({...this.props, active: isLike, like: true})}
+        {this.drawSmile({...this.props, active: !isLike, like: false})}
+      </View>
+    );
   }
   renderBoard() {
     const {
@@ -177,7 +223,7 @@ class Ranking extends Component {
       rankingView = this.renderArcs();
     } else if (mode === STARS){
       rankingView = this.renderStars();
-    } else {
+    } else if (mode === SMILES){
       rankingView = this.renderSmiles();
     }
     return (
@@ -191,12 +237,13 @@ class Ranking extends Component {
 Ranking.defaultProps = {
   mode: 'board',
   enable: false,
-  size: 'md',
   num: 0,
   score: 0,
   scoreBase: 5,
+  scale: 1,
   onScore: () => {},
   name: '',
+  isLike: true,
   activeColor: ACTIVE_COLOR,
   defaultColor: DEFAULT_COLOR,
   fontColor: FONT_COLOR
@@ -205,7 +252,8 @@ Ranking.defaultProps = {
 Ranking.propTypes = {
   mode: PropTypes.oneOf([BOARD, ARCS, SMILES, STARS]),
   enable: PropTypes.bool,
-  size: PropTypes.oneOf([SMALL, MIDDLE, LARGE]),
+  isLike: PropTypes.bool,
+  scale: PropTypes.numerber,
   score: PropTypes.number,
   scoreBase: PropTypes.number,
   onScore: PropTypes.func,
