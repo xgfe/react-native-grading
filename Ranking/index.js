@@ -9,10 +9,11 @@ import {
   TouchableHighlight
 } from 'react-native';
 import {default as styles} from './RankingStyle';
-import {COLOR, MODE, SVG} from './RankingConstants';
+import {COLOR, MODE, STATUS, SVG} from './RankingConstants';
 
-const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR} = COLOR;
+const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR, UNDERLAY_COLOR, DISABLE_COLOR} = COLOR;
 const {BOARD, SMILES, ARCS, STARS} = MODE;
+const {ENABLE, DISABLE, READ_ONLY} = STATUS;
 
 const {
   Shape,
@@ -53,27 +54,30 @@ class Ranking extends Component {
       active,
       scale = 1,
       activeColor = ACTIVE_COLOR,
-      defaultColor = DEFAULT_COLOR
+      defaultColor = DEFAULT_COLOR,
+      status = ENABLE
     } = options || {};
+    let fill = !active ? defaultColor : status === DISABLE ? DISABLE_COLOR : activeColor;
     return (
       <Surface width={50 * scale} height={50 * scale}>
         <Group x={5 * scale} y={5 * scale}>
           <Shape
             scale={40 / 1024 * scale}
-            fill={active ? activeColor : defaultColor}
+            fill={fill}
             d={like ? SVG.HAPPY : SVG.SAD}/>
         </Group>
       </Surface>
     );
   }
   drawArc(options) {
-    const {
+    let {
       activeColor = ACTIVE_COLOR,
       score = 2,
       scoreBase = 10,
       scale = 1,
       fontColor = FONT_COLOR,
-      name = ''
+      name = '',
+      status
     } = options || {};
     const angle = score / scoreBase * 360;
     let fontStyle = {
@@ -87,6 +91,7 @@ class Ranking extends Component {
       marginTop: 24 * scale,
       color: fontColor
     };
+    activeColor = status === DISABLE ? DISABLE_COLOR : activeColor;
     return (
       <View style={[styles.arcContainer]}>
         <View style={[styles.arc]}>
@@ -117,31 +122,32 @@ class Ranking extends Component {
   drawStar(options) {
     const {
       color = ACTIVE_COLOR,
-      scale = 1
+      scale = 1,
+      key,
+      onScore
     } = options || {};
     return (
-      <Surface width={40 * scale} height={40 * scale}>
-        <Group x={20 * scale} y={20 * scale}>
-          <Shape
-            fill={color}
-            scale={scale}
-            d={`M 0.000 10.000
-                L 11.756 16.180
-                L 9.511 3.090
-                L 19.021 -6.180
-                L 5.878 -8.090
-                L 0.000 -20.000
-                L -5.878 -8.090
-                L -19.021 -6.180
-                L -9.511 3.090
-                L -11.756 16.180
-                L 0.000 10.000`}
-            />
-        </Group>
-      </Surface>
+      <TouchableHighlight
+        key={key}
+        underlayColor="transparent"
+        onPress={() => onScore(key)}
+        >
+        <View>
+          <Surface width={40 * scale} height={40 * scale}>
+            <Group x={20 * scale} y={20 * scale}>
+              <Shape
+                fill={color}
+                scale={scale}
+                d={SVG.STAR}
+                />
+            </Group>
+          </Surface>
+        </View>
+      </TouchableHighlight>
     );
   }
   parseNumber(num) {
+    num = ~~num;
     let arr = [];
     while (num > 0) {
       arr.unshift(num % 1000);
@@ -157,32 +163,57 @@ class Ranking extends Component {
     );
   }
   renderStars() {
-    const {
+    let {
       score,
       scoreBase,
       scale,
       activeColor,
-      defaultColor
+      defaultColor,
+      onScore,
+      status
     } = this.props;
     let arr = [];
-    let base = scoreBase;
-    while (base--) { arr.push(1); }
-    let activeStar = this.drawStar({scale: 0.3 * scale, color: activeColor});
-    let defaultStar = this.drawStar({scale: 0.3 * scale, color: defaultColor});
+    activeColor = status === DISABLE ? DISABLE_COLOR : activeColor;
+    defaultColor = status === DISABLE ? DEFAULT_COLOR : defaultColor;
+    while (scoreBase--) { arr.push(1); }
     return (
       <View style={styles.stars}>
         {arr.map((item, index) =>
-          score >= index + 1 ? activeStar : defaultStar
+          score >= index + 1 ?
+          this.drawStar({scale: 0.3 * scale,
+            color: activeColor,
+            key: index + 1,
+            onScore
+          }) : this.drawStar({scale: 0.3 * scale,
+            color: defaultColor,
+            key: index + 1,
+            onScore
+          })
         )}
       </View>
     );
   }
   renderSmiles() {
-    const {isLike} = this.props;
+    const {
+      isLike,
+      onScore
+    } = this.props;
     return (
       <View style={styles.smiles}>
-        {this.drawSmile({...this.props, active: isLike, like: true})}
-        {this.drawSmile({...this.props, active: !isLike, like: false})}
+        <TouchableHighlight
+          underlayColor="transparent"
+          onPress={() => onScore(true)}>
+          <View>
+            {this.drawSmile({...this.props, active: isLike, like: true})}
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight
+          underlayColor="transparent"
+          onPress={() => onScore(false)}>
+          <View>
+            {this.drawSmile({...this.props, active: !isLike, like: false})}
+          </View>
+        </TouchableHighlight>
       </View>
     );
   }
@@ -195,28 +226,40 @@ class Ranking extends Component {
       fontColor
     } = this.props;
     const BASE = 5;
-    let activeStar = this.drawStar({scale: 0.3, color: activeColor});
-    let defaultStar = this.drawStar({scale: 0.3, color: defaultColor});
     let arr = [1, 1, 1, 1, 1];
     return (
-      <View style={styles.board}>
-        <View style={styles.boardScoreWp}>
-          <Text style={[styles.boardScore, {color: activeColor}]}>{(score % BASE).toFixed(1)}</Text>
+      <TouchableHighlight
+        underlayColor={UNDERLAY_COLOR}
+        onPress={this.onPressBoard}>
+        <View style={styles.board}>
+          <View style={styles.boardScoreWp}>
+            <Text style={[styles.boardScore, {color: activeColor}]}>{(score % BASE).toFixed(1)}</Text>
+          </View>
+          <Text style={[styles.boardNum, {color: fontColor}]}>
+            {num < 100000 ? this.parseNumber(num)
+              : num > Math.pow(10, 7) ? '999w+'
+              : this.parseNumber(num / 10000) + 'w+'}
+          </Text>
+          <View style={styles.boardStars}>
+            {arr.map((item, index) =>
+              score >= index + 1 ?
+              this.drawStar({scale: 0.3, color: activeColor, key: index + 1})
+              : this.drawStar({scale: 0.3, color: defaultColor, key: index + 1})
+            )}
+          </View>
         </View>
-        <Text style={[styles.boardNum, {color: fontColor}]}>{num < 1000000 ? this.parseNumber(num) : '100w+'}</Text>
-        <View style={styles.boardStars}>
-          {arr.map((item, index) =>
-            score >= index + 1 ? activeStar : defaultStar
-          )}
-        </View>
-      </View>
+      </TouchableHighlight>
     );
+  }
+  // Event Listeners
+  onPressBoard () {
+    // s
   }
   render() {
     const {
       mode
     } = this.props;
-    let rankingView;
+    let rankingView = <Text>Rendering</Text>;
     if (mode === BOARD) {
       rankingView = this.renderBoard();
     } else if (mode === ARCS) {
@@ -236,7 +279,7 @@ class Ranking extends Component {
 
 Ranking.defaultProps = {
   mode: 'board',
-  enable: false,
+  status: ENABLE,
   num: 0,
   score: 0,
   scoreBase: 5,
@@ -251,9 +294,10 @@ Ranking.defaultProps = {
 
 Ranking.propTypes = {
   mode: PropTypes.oneOf([BOARD, ARCS, SMILES, STARS]),
+  status: PropTypes.oneOf([ENABLE, DISABLE, READ_ONLY]),
   enable: PropTypes.bool,
   isLike: PropTypes.bool,
-  scale: PropTypes.numerber,
+  scale: PropTypes.number,
   score: PropTypes.number,
   scoreBase: PropTypes.number,
   onScore: PropTypes.func,
