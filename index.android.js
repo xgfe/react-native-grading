@@ -14,12 +14,12 @@ import {
 } from 'react-native';
 import Ranking from './Ranking';
 
-class ranking extends Component {
+export default class ranking extends Component {
   constructor(props) {
     super(props);
     this.state = {
       board: {
-        num: 1204,
+        num: 124,
         score: 4.5
       },
       arcs: {
@@ -37,10 +37,13 @@ class ranking extends Component {
     this.changeArcScore = this.changeArcScore.bind(this);
     this.changeSmileScore = this.changeSmileScore.bind(this);
   }
-  changeBoardScore(score) {
+  changeBoardScore(newScore) {
+    const {num, score} = this.state.board;
     this.setState({
-      num: this.state.num + 1,
-      score: (this.state.score * this.state.num) / (this.state.num + 1)
+      board: {
+        num: num + 1,
+        score: (score * num + newScore) / (num + 1)
+      }
     });
   }
   changeStarScore(score) {
@@ -67,11 +70,13 @@ class ranking extends Component {
             defaultColor="#9ce0d6"
             onScore={this.changeBoardScore}
             />
-          <Ranking score={4.0} num={72346} fontColor="#552da6"/>
-          <Ranking score={2.45} num={712338} activeColor="#2bb8aa"/>
+          <Ranking score={4.0} num={72346} fontColor="#552da6" status={1}/>
+          <Ranking score={2.45} num={712338} activeColor="#2bb8aa" status={2}/>
           <Ranking
-            score={this.state.board.score}
+            score={4.9}
             num={234234523478}
+            status={2}
+            fontColor="#3c77b5"
             />
         </View>
         <View style={styles.starsRanking}>
@@ -79,9 +84,9 @@ class ranking extends Component {
           <Ranking
             mode="stars"
             scale={2}
-            score={4}
             scoreBase={8}
             defaultColor="#dad9b8"
+            score={5}
             status={1}/>
           <Ranking
             mode="stars"
@@ -117,7 +122,7 @@ class ranking extends Component {
             isLike={this.state.smiles.isLike}
             onScore={this.changeSmileScore}/>
           <Ranking mode="smiles" scale={1.2} activeColor="#d23f2b" isLike={false} status={1}/>
-          <Ranking mode="smiles" scale={1.4} activeColor="#f2558d" isLike={false} status={2}/>
+          <Ranking mode="smiles" scale={1.4} activeColor="#f2558d" isLike={true} status={2}/>
         </View>
       </ScrollView>
     );

@@ -4,4 +4,4 @@
  * @flow
  */
 
-require('./index.android.js');
+export {default} from './index.android.js';

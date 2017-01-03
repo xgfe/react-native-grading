@@ -51,5 +51,27 @@ export default StyleSheet.create({
   smiles: {
     flexDirection: 'row',
     justifyContent: 'space-around'
+  },
+  modalMask: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#00000077'
+  },
+  modalContainer: {
+    // justifyContent: 'center',
+    // alignItems: 'center'
+  },
+  modal: {
+    height: 251,
+    width: 240,
+    opacity: 0.5,
+    overflow: 'hidden',
+    borderRadius: 10,
+    backgroundColor: '#fff'
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around'
   }
 });

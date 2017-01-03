@@ -6,9 +6,15 @@ import {
   ART,
   Text,
   View,
+  Modal,
+  Picker,
+  Button,
+  Platform,
+  Animated,
+  PanResponder,
   TouchableHighlight
 } from 'react-native';
-import {default as styles} from './RankingStyle';
+import styles from './RankingStyle';
 import {COLOR, MODE, STATUS, SVG} from './RankingConstants';
 
 const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR, UNDERLAY_COLOR, DISABLE_COLOR} = COLOR;
@@ -43,10 +49,70 @@ class Ranking extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      scored: false,
+      isModalVisible: false,
+      animatedModalOpactiy: new Animated.Value(0.4),
+      score: this.props.score
     };
+    this._panResponder = PanResponder.create({
+      // 要求成为响应者：
+      onStartShouldSetPanResponder: (evt, gestureState) => true,
+      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onMoveShouldSetPanResponder: (evt, gestureState) => true,
+      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        // 开始手势操作。给用户一些视觉反馈，让他们知道发生了什么事情！
+        // gestureState.{x,y}0 现在会被设置为0
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        // 最近一次的移动距离为gestureState.move{X,Y}
+        // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
+      },
+      onPanResponderTerminationRequest: (evt, gestureState) => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        // 用户放开了所有的触摸点，且此时视图已经成为了响应者。
+        // 一般来说这意味着一个手势操作已经成功完成。
+      },
+      onPanResponderTerminate: (evt, gestureState) => {
+        // 另一个组件已经成为了新的响应者，所以当前手势将被取消。
+      },
+      onShouldBlockNativeResponder: (evt, gestureState) => {
+        // 返回一个布尔值，决定当前组件是否应该阻止原生组件成为JS响应者
+        // 默认返回true。目前暂时只支持android。
+        return true;
+      }
+    });
+    this.noop = this.noop.bind(this);
+    this.renderArcs = this.renderArcs.bind(this);
+    this.renderStars = this.renderStars.bind(this);
+    this.renderBoard = this.renderBoard.bind(this);
+    this.renderSmiles = this.renderSmiles.bind(this);
+    this.onPressBoard = this.onPressBoard.bind(this);
+    this.onPressCancel = this.onPressCancel.bind(this);
+    this.onPressConfirm = this.onPressConfirm.bind(this);
+    this.setModalVisible = this.setModalVisible.bind(this);
   }
-  noop() {
-    return true;
+  noop () { }
+  setModalVisible (isModalVisible) {
+    const {height, duration} = this.props;
+    this.setState({isModalVisible: isModalVisible});
+    if (isModalVisible) {
+      Animated.timing(
+        this.state.animatedModalOpactiy,
+        {
+          toValue: 1,
+          duration: duration
+        }
+      ).start();
+    } else {
+      Animated.timing(
+        this.state.animatedModalOpactiy,
+        {
+          toValue: 0,
+          duration: duration
+        }
+      ).start();
+    }
   }
   drawSmile(options) {
     const {
@@ -124,7 +190,7 @@ class Ranking extends Component {
       color = ACTIVE_COLOR,
       scale = 1,
       key,
-      onScore
+      onScore = this.noop
     } = options || {};
     return (
       <TouchableHighlight
@@ -156,10 +222,17 @@ class Ranking extends Component {
     return arr.join();
   }
   renderArcs() {
+    const {
+      status
+    } = this.props;
     return (
-      <View style={styles.arcs}>
-        {this.drawArc({...this.props})}
-      </View>
+      <TouchableHighlight
+        underlayColor="transparent"
+        onPress={() => {}}>
+        <View style={styles.arcs}>
+          {this.drawArc({...this.props})}
+        </View>
+      </TouchableHighlight>
     );
   }
   renderStars() {
@@ -175,6 +248,7 @@ class Ranking extends Component {
     let arr = [];
     activeColor = status === DISABLE ? DISABLE_COLOR : activeColor;
     defaultColor = status === DISABLE ? DEFAULT_COLOR : defaultColor;
+    onScore = status === ENABLE ? onScore : this.noop;
     while (scoreBase--) { arr.push(1); }
     return (
       <View style={styles.stars}>
@@ -196,20 +270,22 @@ class Ranking extends Component {
   renderSmiles() {
     const {
       isLike,
-      onScore
+      onScore,
+      status
     } = this.props;
+    let onPress = status === ENABLE ? onScore : this.noop;
     return (
       <View style={styles.smiles}>
         <TouchableHighlight
           underlayColor="transparent"
-          onPress={() => onScore(true)}>
+          onPress={() => onPress(true)}>
           <View>
             {this.drawSmile({...this.props, active: isLike, like: true})}
           </View>
         </TouchableHighlight>
         <TouchableHighlight
           underlayColor="transparent"
-          onPress={() => onScore(false)}>
+          onPress={() => onPress(false)}>
           <View>
             {this.drawSmile({...this.props, active: !isLike, like: false})}
           </View>
@@ -220,22 +296,32 @@ class Ranking extends Component {
   renderBoard() {
     const {
       score,
+      status,
       num,
       activeColor,
       defaultColor,
       fontColor
     } = this.props;
+    let mainColor = status === DISABLE ? DISABLE_COLOR : activeColor;
+    let font = status === DISABLE ? FONT_COLOR : fontColor;
     const BASE = 5;
     let arr = [1, 1, 1, 1, 1];
+    let selectArr = [];
+    let i = 0;
+    while (i < BASE * 10) {
+      i += 1;
+      selectArr.push(i);
+    }
+    selectArr = selectArr.map(item => item / 10);
     return (
       <TouchableHighlight
         underlayColor={UNDERLAY_COLOR}
         onPress={this.onPressBoard}>
         <View style={styles.board}>
           <View style={styles.boardScoreWp}>
-            <Text style={[styles.boardScore, {color: activeColor}]}>{(score % BASE).toFixed(1)}</Text>
+            <Text style={[styles.boardScore, {color: mainColor}]}>{(score % BASE).toFixed(1)}</Text>
           </View>
-          <Text style={[styles.boardNum, {color: fontColor}]}>
+          <Text style={[styles.boardNum, {color: font}]}>
             {num < 100000 ? this.parseNumber(num)
               : num > Math.pow(10, 7) ? '999w+'
               : this.parseNumber(num / 10000) + 'w+'}
@@ -243,17 +329,79 @@ class Ranking extends Component {
           <View style={styles.boardStars}>
             {arr.map((item, index) =>
               score >= index + 1 ?
-              this.drawStar({scale: 0.3, color: activeColor, key: index + 1})
+              this.drawStar({scale: 0.3, color: mainColor, key: index + 1})
               : this.drawStar({scale: 0.3, color: defaultColor, key: index + 1})
             )}
           </View>
+          {Platform.OS === 'ios' && <Modal
+            transparent={true}
+            visible={this.state.isModalVisible}
+            onRequestClose={() => {this.setModalVisible(false);}}>
+              <View style={{flex: 1}}>
+                <TouchableHighlight
+                  style={styles.modalMask}
+                  activeOpacity={1}
+                  underlayColor="#00000077"
+                  onPress={this.onPressCancel}>
+                  <TouchableHighlight
+                    underlayColor="#fff"
+                    style={styles.modalContainer}>
+                    <Animated.View style={[styles.modal, {opacity: this.state.animatedModalOpactiy}]}>
+                      <View>
+                        <Picker
+                          selectedValue={this.state.score}
+                          onValueChange={(value) => !this.state.scored && this.setState({score: value})}>
+                          {selectArr.map(item =>
+                            <Picker.Item label={item.toFixed(1)} value={item} key={item}/>
+                          )}
+                        </Picker>
+                      </View>
+                        {this.state.scored ?
+                          <Button
+                            onPress={this.onPressCancel}
+                            title="您已评价"
+                            color="#888"
+                            /> :
+                          <View style={styles.modalButtons}>
+                            <Button
+                              onPress={this.onPressCancel}
+                              title="取消"
+                              color="#888"
+                              />
+                            <Button
+                              onPress={this.onPressConfirm}
+                              title="确定"
+                              />
+                          </View>
+                        }
+                    </Animated.View>
+                  </TouchableHighlight>
+                </TouchableHighlight>
+              </View>
+          </Modal>}
         </View>
       </TouchableHighlight>
     );
   }
+  onPressCancel () {
+    this.setModalVisible(false);
+  }
+  onPressConfirm () {
+    this.setState({scored: true});
+    this.props.onScore(this.state.score);
+    this.setModalVisible(false);
+  }
   // Event Listeners
   onPressBoard () {
-    // s
+    const {status} = this.props;
+    if (status !== ENABLE) return;
+    if (Platform.OS === 'ios') {
+      this.setModalVisible(true);
+    } else {
+    }
+  }
+  onDatePicked () {
+
   }
   render() {
     const {
@@ -286,6 +434,7 @@ Ranking.defaultProps = {
   scale: 1,
   onScore: () => {},
   name: '',
+  duration: 300,
   isLike: true,
   activeColor: ACTIVE_COLOR,
   defaultColor: DEFAULT_COLOR,
@@ -303,6 +452,7 @@ Ranking.propTypes = {
   onScore: PropTypes.func,
   num: PropTypes.number,
   name: PropTypes.string,
+  duration: React.PropTypes.number,
   activeColor: PropTypes.string,
   defaultColor: PropTypes.string,
   fontColor: PropTypes.string
