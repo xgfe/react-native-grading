@@ -40,4 +40,4 @@ android/keystores/debug.keystore
 .vscode
 tsconfig.json
 
-yarn.lock
+coverage/

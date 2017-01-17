@@ -10,16 +10,13 @@ import {
   Picker,
   Button,
   Platform,
-  Animated,
-  PanResponder,
   TouchableHighlight
 } from 'react-native';
-import styles from './RankingStyle';
-import {COLOR, MODE, STATUS, SVG} from './RankingConstants';
+import styles from './ScoreStyle';
+import {COLOR, MODE, SVG} from './ScoreConstants';
 
 const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR, UNDERLAY_COLOR, DISABLE_COLOR} = COLOR;
 const {BOARD, SMILES, ARCS, STARS} = MODE;
-const {ENABLE, DISABLE, READ_ONLY} = STATUS;
 
 const {
   Shape,
@@ -45,75 +42,54 @@ function generateArcPath (x, y, radius, startAngle, endAngle) {
   ].join(' ');
 }
 
-class Ranking extends Component {
+class Score extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      scored: false,
-      isModalVisible: false,
-      animatedModalOpactiy: new Animated.Value(0.4),
+
       score: this.props.score
     };
-    this._panResponder = PanResponder.create({
-      // 要求成为响应者：
-      onStartShouldSetPanResponder: (evt, gestureState) => true,
-      onStartShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onMoveShouldSetPanResponder: (evt, gestureState) => true,
-      onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
-      onPanResponderGrant: (evt, gestureState) => {
-        // 开始手势操作。给用户一些视觉反馈，让他们知道发生了什么事情！
-        // gestureState.{x,y}0 现在会被设置为0
-      },
-      onPanResponderMove: (evt, gestureState) => {
-        // 最近一次的移动距离为gestureState.move{X,Y}
-        // 从成为响应者开始时的累计手势移动距离为gestureState.d{x,y}
-      },
-      onPanResponderTerminationRequest: (evt, gestureState) => true,
-      onPanResponderRelease: (evt, gestureState) => {
-        // 用户放开了所有的触摸点，且此时视图已经成为了响应者。
-        // 一般来说这意味着一个手势操作已经成功完成。
-      },
-      onPanResponderTerminate: (evt, gestureState) => {
-        // 另一个组件已经成为了新的响应者，所以当前手势将被取消。
-      },
-      onShouldBlockNativeResponder: (evt, gestureState) => {
-        // 返回一个布尔值，决定当前组件是否应该阻止原生组件成为JS响应者
-        // 默认返回true。目前暂时只支持android。
-        return true;
-      }
-    });
+    this.score = 0;
     this.noop = this.noop.bind(this);
     this.renderArcs = this.renderArcs.bind(this);
     this.renderStars = this.renderStars.bind(this);
     this.renderBoard = this.renderBoard.bind(this);
     this.renderSmiles = this.renderSmiles.bind(this);
     this.onPressBoard = this.onPressBoard.bind(this);
-    this.onPressCancel = this.onPressCancel.bind(this);
-    this.onPressConfirm = this.onPressConfirm.bind(this);
-    this.setModalVisible = this.setModalVisible.bind(this);
+    this.onPressArc = this.onPressArc.bind(this);
+  }
+  throttle(fn, time) {
+    let running = false;
+    let isFrame = false;
+    if (!time) isFrame = true;
+    const getCallback = (self, args) => {
+      return () => {
+        fn.apply(self, args);
+        running = false;
+      };
+    };
+    return function () {
+      if (running) return;
+      running = true;
+      if (isFrame) {
+        window.requestAnimationFrame(getCallback(this, arguments));
+      } else {
+        setTimeout(getCallback(this, arguments), time);
+      }
+    };
+  }
+  moveArc (evt, gestureState) {
+    const {scoreBase, score, onScore} = this.props;
+    let ds = -gestureState.dy / 300 * scoreBase;
+    this.score = ds + score;
+    if (this.score > scoreBase) {
+      this.score = scoreBase;
+    } else if (this.score < 0) {
+      this.score = 0;
+    }
+    onScore(this.score);
   }
   noop () { }
-  setModalVisible (isModalVisible) {
-    const {height, duration} = this.props;
-    this.setState({isModalVisible: isModalVisible});
-    if (isModalVisible) {
-      Animated.timing(
-        this.state.animatedModalOpactiy,
-        {
-          toValue: 1,
-          duration: duration
-        }
-      ).start();
-    } else {
-      Animated.timing(
-        this.state.animatedModalOpactiy,
-        {
-          toValue: 0,
-          duration: duration
-        }
-      ).start();
-    }
-  }
   drawSmile(options) {
     const {
       like,
@@ -121,9 +97,9 @@ class Ranking extends Component {
       scale = 1,
       activeColor = ACTIVE_COLOR,
       defaultColor = DEFAULT_COLOR,
-      status = ENABLE
+      enable = true
     } = options || {};
-    let fill = !active ? defaultColor : status === DISABLE ? DISABLE_COLOR : activeColor;
+    let fill = !active ? defaultColor : !enable ? DISABLE_COLOR : activeColor;
     return (
       <Surface width={50 * scale} height={50 * scale}>
         <Group x={5 * scale} y={5 * scale}>
@@ -138,13 +114,14 @@ class Ranking extends Component {
   drawArc(options) {
     let {
       activeColor = ACTIVE_COLOR,
-      score = 2,
       scoreBase = 10,
       scale = 1,
+      score,
       fontColor = FONT_COLOR,
       name = '',
-      status
+      enable
     } = options || {};
+    this.score = score;
     const angle = score / scoreBase * 360;
     let fontStyle = {
       fontSize: 20 * scale,
@@ -157,7 +134,7 @@ class Ranking extends Component {
       marginTop: 24 * scale,
       color: fontColor
     };
-    activeColor = status === DISABLE ? DISABLE_COLOR : activeColor;
+    activeColor = !enable ? DISABLE_COLOR : activeColor;
     return (
       <View style={[styles.arcContainer]}>
         <View style={[styles.arc]}>
@@ -180,7 +157,7 @@ class Ranking extends Component {
             </Group>
           </Surface>
         </View>
-        <Text style={[styles.arcScore, fontStyle]}>{(score % scoreBase).toFixed(1)}</Text>
+        <Text style={[styles.arcScore, fontStyle]}>{(this.score).toFixed(1)}</Text>
         <Text style={nameStyle}>{name}</Text>
       </View>
     );
@@ -221,16 +198,26 @@ class Ranking extends Component {
     }
     return arr.join();
   }
-  renderArcs() {
-    const {
-      status
-    } = this.props;
+  onPressArc () {
+    const {readOnly, enable} = this.props;
+    if (readOnly || !enable) return;
+    this.refs.modal.openModal();
+  }
+  renderArcs () {
+    const {score, scoreBase, onScore} = this.props;
     return (
       <TouchableHighlight
         underlayColor="transparent"
-        onPress={() => {}}>
+        onPress={this.onPressArc}>
         <View style={styles.arcs}>
           {this.drawArc({...this.props})}
+          {<ScoreModal
+            ref="modal"
+            score={score}
+            scoreBase={scoreBase}
+            scored={false}
+            onScore={onScore}
+          />}
         </View>
       </TouchableHighlight>
     );
@@ -243,12 +230,13 @@ class Ranking extends Component {
       activeColor,
       defaultColor,
       onScore,
-      status
+      enable,
+      readOnly
     } = this.props;
     let arr = [];
-    activeColor = status === DISABLE ? DISABLE_COLOR : activeColor;
-    defaultColor = status === DISABLE ? DEFAULT_COLOR : defaultColor;
-    onScore = status === ENABLE ? onScore : this.noop;
+    activeColor = !enable ? DISABLE_COLOR : activeColor;
+    defaultColor = !enable ? DEFAULT_COLOR : defaultColor;
+    onScore = enable && !readOnly ? onScore : this.noop;
     while (scoreBase--) { arr.push(1); }
     return (
       <View style={styles.stars}>
@@ -271,9 +259,10 @@ class Ranking extends Component {
     const {
       isLike,
       onScore,
-      status
+      enable,
+      readOnly
     } = this.props;
-    let onPress = status === ENABLE ? onScore : this.noop;
+    let onPress = enable && !readOnly ? onScore : this.noop;
     return (
       <View style={styles.smiles}>
         <TouchableHighlight
@@ -293,26 +282,25 @@ class Ranking extends Component {
       </View>
     );
   }
+  onPressBoard () {
+    const {enable, readOnly} = this.props;
+    if (!enable || readOnly) return;
+    this.refs.modal.openModal();
+  }
   renderBoard() {
     const {
       score,
-      status,
       num,
       activeColor,
       defaultColor,
-      fontColor
+      fontColor,
+      enable,
+      onScore
     } = this.props;
-    let mainColor = status === DISABLE ? DISABLE_COLOR : activeColor;
-    let font = status === DISABLE ? FONT_COLOR : fontColor;
+    let mainColor = !enable ? DISABLE_COLOR : activeColor;
+    let font = !enable ? FONT_COLOR : fontColor;
     const BASE = 5;
     let arr = [1, 1, 1, 1, 1];
-    let selectArr = [];
-    let i = 0;
-    while (i < BASE * 10) {
-      i += 1;
-      selectArr.push(i);
-    }
-    selectArr = selectArr.map(item => item / 10);
     return (
       <TouchableHighlight
         underlayColor={UNDERLAY_COLOR}
@@ -333,75 +321,16 @@ class Ranking extends Component {
               : this.drawStar({scale: 0.3, color: defaultColor, key: index + 1})
             )}
           </View>
-          {Platform.OS === 'ios' && <Modal
-            transparent={true}
-            visible={this.state.isModalVisible}
-            onRequestClose={() => {this.setModalVisible(false);}}>
-              <View style={{flex: 1}}>
-                <TouchableHighlight
-                  style={styles.modalMask}
-                  activeOpacity={1}
-                  underlayColor="#00000077"
-                  onPress={this.onPressCancel}>
-                  <TouchableHighlight
-                    underlayColor="#fff"
-                    style={styles.modalContainer}>
-                    <Animated.View style={[styles.modal, {opacity: this.state.animatedModalOpactiy}]}>
-                      <View>
-                        <Picker
-                          selectedValue={this.state.score}
-                          onValueChange={(value) => !this.state.scored && this.setState({score: value})}>
-                          {selectArr.map(item =>
-                            <Picker.Item label={item.toFixed(1)} value={item} key={item}/>
-                          )}
-                        </Picker>
-                      </View>
-                        {this.state.scored ?
-                          <Button
-                            onPress={this.onPressCancel}
-                            title="您已评价"
-                            color="#888"
-                            /> :
-                          <View style={styles.modalButtons}>
-                            <Button
-                              onPress={this.onPressCancel}
-                              title="取消"
-                              color="#888"
-                              />
-                            <Button
-                              onPress={this.onPressConfirm}
-                              title="确定"
-                              />
-                          </View>
-                        }
-                    </Animated.View>
-                  </TouchableHighlight>
-                </TouchableHighlight>
-              </View>
-          </Modal>}
+          {<ScoreModal
+            ref="modal"
+            score={score}
+            scoreBase={BASE}
+            scored={false}
+            onScore={onScore}
+          />}
         </View>
       </TouchableHighlight>
     );
-  }
-  onPressCancel () {
-    this.setModalVisible(false);
-  }
-  onPressConfirm () {
-    this.setState({scored: true});
-    this.props.onScore(this.state.score);
-    this.setModalVisible(false);
-  }
-  // Event Listeners
-  onPressBoard () {
-    const {status} = this.props;
-    if (status !== ENABLE) return;
-    if (Platform.OS === 'ios') {
-      this.setModalVisible(true);
-    } else {
-    }
-  }
-  onDatePicked () {
-
   }
   render() {
     const {
@@ -425,26 +354,27 @@ class Ranking extends Component {
   }
 }
 
-Ranking.defaultProps = {
+Score.defaultProps = {
   mode: 'board',
-  status: ENABLE,
+  enable: true,
+  readOnly: false,
   num: 0,
   score: 0,
   scoreBase: 5,
   scale: 1,
   onScore: () => {},
   name: '',
-  duration: 300,
+  duration: 200,
   isLike: true,
   activeColor: ACTIVE_COLOR,
   defaultColor: DEFAULT_COLOR,
   fontColor: FONT_COLOR
 };
 
-Ranking.propTypes = {
+Score.propTypes = {
   mode: PropTypes.oneOf([BOARD, ARCS, SMILES, STARS]),
-  status: PropTypes.oneOf([ENABLE, DISABLE, READ_ONLY]),
   enable: PropTypes.bool,
+  readOnly: PropTypes.bool,
   isLike: PropTypes.bool,
   scale: PropTypes.number,
   score: PropTypes.number,
@@ -458,4 +388,109 @@ Ranking.propTypes = {
   fontColor: PropTypes.string
 };
 
-export default Ranking;
+class ScoreModal extends Component {
+  static propTypes = {
+    scored: PropTypes.bool,
+    scoreBase: PropTypes.number,
+    visible: PropTypes.bool,
+    onScore: PropTypes.func,
+    duration: PropTypes.number
+  }
+  static defaultProps = {
+    scored: false,
+    scoreBase: 5,
+    visible: false,
+    duration: 200,
+    onScore: () => {}
+  }
+  constructor (props) {
+    super(props);
+    this.state = {
+      score: this.props.score,
+      isModalVisible: false
+    };
+    this.openModal = this.openModal.bind(this);
+    this.setModalVisible = this.setModalVisible.bind(this);
+    this.onPressCancel = this.onPressCancel.bind(this);
+    this.onPressConfirm = this.onPressConfirm.bind(this);
+  }
+  setModalVisible (isModalVisible) {
+    this.setState({isModalVisible: isModalVisible});
+  }
+  openModal () {
+    this.setModalVisible(true);
+  }
+  onPressCancel () {
+    this.setModalVisible(false);
+  }
+  onPressConfirm () {
+    this.props.onScore(this.state.score);
+    this.setModalVisible(false);
+  }
+  render () {
+    const {scoreBase} = this.props;
+    let selectArr = [];
+    let i = 0;
+    while (i < scoreBase * 10) {
+      i += 1;
+      selectArr.push(i);
+    }
+    selectArr = selectArr.map(item => item / 10);
+    return (
+      <Modal
+        transparent={true}
+        visible={this.state.isModalVisible}
+        onRequestClose={() => {this.setModalVisible(false);}}>
+          <View style={{flex: 1}}>
+            <TouchableHighlight
+              style={styles.modalMask}
+              activeOpacity={1}
+              underlayColor="#00000077"
+              onPress={this.onPressCancel}>
+              <TouchableHighlight
+                underlayColor="#fff"
+                style={styles.modalContainer}>
+                <View style={styles.modal}>
+                  <View>
+                    <Picker
+                      selectedValue={this.state.score}
+                      onValueChange={(value) => !this.props.scored && this.setState({score: value})}>
+                      {selectArr.map(item =>
+                        <Picker.Item label={item.toFixed(1)} value={item} key={item}/>
+                      )}
+                    </Picker>
+                  </View>
+                    {this.props.scored ?
+                      <View style={styles.modalButtons}>
+                        <Button
+                          onPress={this.onPressCancel}
+                          title="您已评价"
+                          color="#888"/>
+                      </View> :
+                      <View style={styles.modalButtons}>
+                        <View style={styles.modalButton}>
+                          <Button
+                            onPress={this.onPressCancel}
+                            title="取消"
+                            color="#888"
+                            />
+                        </View>
+                        <View style={[styles.modalButton, styles.confirmButton]}>
+                          <Button
+                            style={styles.modalButton}
+                            onPress={this.onPressConfirm}
+                            title="确定"
+                            />
+                        </View>
+                      </View>
+                    }
+                </View>
+              </TouchableHighlight>
+            </TouchableHighlight>
+          </View>
+      </Modal>
+    );
+  }
+}
+
+export default Score;

@@ -1,4 +1,6 @@
-import {StyleSheet} from 'react-native';
+import {StyleSheet, Dimensions} from 'react-native';
+const {width, height, scale} = Dimensions.get('window');
+
 export default StyleSheet.create({
   board: {
     alignItems: 'center',
@@ -33,9 +35,9 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   arcs: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'flex-start'
+    // flexDirection: 'row',
+    // justifyContent: 'center',
+    // alignItems: 'flex-start'
   },
   arcContainer: {
     alignItems: 'center'
@@ -59,19 +61,25 @@ export default StyleSheet.create({
     backgroundColor: '#00000077'
   },
   modalContainer: {
-    // justifyContent: 'center',
-    // alignItems: 'center'
   },
   modal: {
     height: 251,
-    width: 240,
-    opacity: 0.5,
+    width: width * 0.6,
     overflow: 'hidden',
     borderRadius: 10,
     backgroundColor: '#fff'
   },
   modalButtons: {
+    borderTopWidth: 1 / scale,
+    borderColor: '#c6c6c6',
     flexDirection: 'row',
     justifyContent: 'space-around'
+  },
+  modalButton: {
+    width: 120
+  },
+  confirmButton: {
+    borderLeftWidth: 1 / scale,
+    borderColor: '#c6c6c6'
   }
 });

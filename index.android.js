@@ -9,12 +9,11 @@ import {
   AppRegistry,
   StyleSheet,
   View,
-  ScrollView,
-  Text
+  Text,
+  ScrollView
 } from 'react-native';
-import Ranking from './Ranking';
-
-export default class ranking extends Component {
+import Score from './Score';
+export default class scoring extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -52,7 +51,10 @@ export default class ranking extends Component {
     });
   }
   changeArcScore(score) {
-
+    console.log(score);
+    this.setState({
+      arcs: {score: score}
+    });
   }
   changeSmileScore(score) {
     this.setState({
@@ -63,32 +65,32 @@ export default class ranking extends Component {
     return (
       <ScrollView style={styles.container}>
         <Text style={styles.welcome}>Examples about react-native-ranking</Text>
-        <View style={styles.boardRanking}>
-          <Ranking
+        <View style={styles.boardScore}>
+          <Score
             score={this.state.board.score}
             num={this.state.board.num}
             defaultColor="#9ce0d6"
             onScore={this.changeBoardScore}
             />
-          <Ranking score={4.0} num={72346} fontColor="#552da6" status={1}/>
-          <Ranking score={2.45} num={712338} activeColor="#2bb8aa" status={2}/>
-          <Ranking
+          <Score score={4.0} num={72346} fontColor="#552da6" readOnly={true}/>
+          <Score score={2.45} num={712338} activeColor="#2bb8aa" enable={false}/>
+          <Score
             score={4.9}
             num={234234523478}
-            status={2}
+            readOnly={true}
             fontColor="#3c77b5"
             />
         </View>
-        <View style={styles.starsRanking}>
-          <Ranking mode="stars" score={4.45} status={2}/>
-          <Ranking
+        <View style={styles.starsScore}>
+          <Score mode="stars" score={4.45} status={2}/>
+          <Score
             mode="stars"
             scale={2}
             scoreBase={8}
             defaultColor="#dad9b8"
             score={5}
             status={1}/>
-          <Ranking
+          <Score
             mode="stars"
             scale={2.4}
             score={this.state.stars.score}
@@ -96,9 +98,9 @@ export default class ranking extends Component {
             activeColor="#eb5461"
             onScore={this.changeStarScore}/>
         </View>
-        <View style={styles.arcsRanking}>
-          <Ranking mode="arcs" score={6.2} scoreBase={10} name="市占比"/>
-          <Ranking
+        <View style={styles.arcsScore}>
+          <Score mode="arcs" score={6.2} scoreBase={10} name="市占比"/>
+          <Score
             mode="arcs"
             score={this.state.arcs.score}
             scoreBase={10}
@@ -108,7 +110,7 @@ export default class ranking extends Component {
             name="环比增长"
             status={2}
             />
-          <Ranking
+          <Score
             mode="arcs"
             score={1.2}
             scale={1.6}
@@ -116,13 +118,13 @@ export default class ranking extends Component {
             status={1}
             />
         </View>
-        <View style={styles.simlesRanking}>
-          <Ranking
+        <View style={styles.simlesScore}>
+          <Score
             mode="smiles"
             isLike={this.state.smiles.isLike}
             onScore={this.changeSmileScore}/>
-          <Ranking mode="smiles" scale={1.2} activeColor="#d23f2b" isLike={false} status={1}/>
-          <Ranking mode="smiles" scale={1.4} activeColor="#f2558d" isLike={true} status={2}/>
+          <Score mode="smiles" scale={1.2} activeColor="#d23f2b" isLike={false} status={1}/>
+          <Score mode="smiles" scale={1.4} activeColor="#f2558d" isLike={true} status={2}/>
         </View>
       </ScrollView>
     );
@@ -140,23 +142,24 @@ const styles = StyleSheet.create({
     margin: 10,
     color: '#333333'
   },
-  boardRanking: {
+  boardScore: {
     flexDirection: 'row',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    flexWrap: 'wrap'
   },
-  starsRanking: {
+  starsScore: {
     flex: 1,
     marginTop: 20,
     justifyContent: 'space-around'
   },
-  arcsRanking: {
+  arcsScore: {
     marginTop: 20,
     justifyContent: 'space-around'
   },
-  simlesRanking: {
+  simlesScore: {
     marginTop: 20,
     alignItems: 'center'
   }
 });
 
-AppRegistry.registerComponent('ranking', () => ranking);
+AppRegistry.registerComponent('ranking', () => scoring);

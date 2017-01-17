@@ -1,1 +1,3 @@
-## react-native-ranking
+## react-native-score
+
+Score
