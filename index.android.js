@@ -1,7 +1,6 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * Created by TinySymphony on 2016-12-26.
+ * Android Examples
  */
 
 import React, {Component} from 'react';
@@ -12,8 +11,8 @@ import {
   Text,
   ScrollView
 } from 'react-native';
-import Score from './Score';
-export default class scoring extends Component {
+import Grading from './Grading';
+export default class grading extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -64,67 +63,67 @@ export default class scoring extends Component {
   render() {
     return (
       <ScrollView style={styles.container}>
-        <Text style={styles.welcome}>Examples about react-native-ranking</Text>
-        <View style={styles.boardScore}>
-          <Score
+        <Text style={styles.welcome}>Examples about react-native-grading</Text>
+        <View style={styles.boardGrading}>
+          <Grading
             score={this.state.board.score}
             num={this.state.board.num}
             defaultColor="#9ce0d6"
-            onScore={this.changeBoardScore}
+            onGrading={this.changeBoardScore}
             />
-          <Score score={4.0} num={72346} fontColor="#552da6" readOnly={true}/>
-          <Score score={2.45} num={712338} activeColor="#2bb8aa" enable={false}/>
-          <Score
+          <Grading score={4.0} num={72346} fontColor="#552da6" readOnly={true}/>
+          <Grading score={2.45} num={712338} activeColor="#2bb8aa" enable={false}/>
+          <Grading
             score={4.9}
             num={234234523478}
             readOnly={true}
             fontColor="#3c77b5"
             />
         </View>
-        <View style={styles.starsScore}>
-          <Score mode="stars" score={4.45} status={2}/>
-          <Score
-            mode="stars"
-            scale={2}
-            scoreBase={8}
-            defaultColor="#dad9b8"
-            score={5}
-            status={1}/>
-          <Score
+        <View style={styles.starsGrading}>
+          <Grading
             mode="stars"
             scale={2.4}
             score={this.state.stars.score}
             scoreBase={10}
             activeColor="#eb5461"
-            onScore={this.changeStarScore}/>
+            onGrading={this.changeStarScore}/>
+          <Grading
+            mode="stars"
+            scale={2}
+            scoreBase={8}
+            defaultColor="#dad9b8"
+            score={5}
+            enable={false}/>
+          <Grading mode="stars" score={4.45} readOnly={true}/>
         </View>
-        <View style={styles.arcsScore}>
-          <Score mode="arcs" score={6.2} scoreBase={10} name="市占比"/>
-          <Score
+        <View style={styles.arcsGrading}>
+          <Grading mode="arcs" score={this.state.arcs.score} scoreBase={10} name="Design" onGrading={this.changeArcScore}/>
+          <Grading
             mode="arcs"
-            score={this.state.arcs.score}
+            score={4.7}
             scoreBase={10}
             activeColor="#2bb8aa"
             scale={1.2}
-            onScore={this.changeArcScore}
-            name="环比增长"
-            status={2}
+            name="Creativity"
+            readOnly={true}
             />
-          <Score
+          <Grading
             mode="arcs"
-            score={1.2}
+            score={45}
             scale={1.6}
-            name="同比增长"
-            status={1}
+            isPercentage={true}
+            name="Usability"
+            enable={false}
             />
         </View>
-        <View style={styles.simlesScore}>
-          <Score
+        <View style={styles.simlesGrading}>
+          <Grading
             mode="smiles"
             isLike={this.state.smiles.isLike}
-            onScore={this.changeSmileScore}/>
-          <Score mode="smiles" scale={1.2} activeColor="#d23f2b" isLike={false} status={1}/>
-          <Score mode="smiles" scale={1.4} activeColor="#f2558d" isLike={true} status={2}/>
+            onGrading={this.changeSmileScore}/>
+          <Grading mode="smiles" scale={1.2} activeColor="#d23f2b" isLike={false} readOnly={true}/>
+          <Grading mode="smiles" scale={1.4} activeColor="#f2558d" isLike={true} enable={false}/>
         </View>
       </ScrollView>
     );
@@ -142,24 +141,24 @@ const styles = StyleSheet.create({
     margin: 10,
     color: '#333333'
   },
-  boardScore: {
+  boardGrading: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     flexWrap: 'wrap'
   },
-  starsScore: {
+  starsGrading: {
     flex: 1,
     marginTop: 20,
     justifyContent: 'space-around'
   },
-  arcsScore: {
+  arcsGrading: {
     marginTop: 20,
     justifyContent: 'space-around'
   },
-  simlesScore: {
+  simlesGrading: {
     marginTop: 20,
     alignItems: 'center'
   }
 });
 
-AppRegistry.registerComponent('ranking', () => scoring);
+AppRegistry.registerComponent('ranking', () => grading);

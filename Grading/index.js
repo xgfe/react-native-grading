@@ -1,3 +1,9 @@
+/**
+ * Created by TinySymphony on 2016-12-26.
+ * index
+ * @export Grading Component
+ */
+
 import React, {
   Component,
   PropTypes
@@ -6,14 +12,11 @@ import {
   ART,
   Text,
   View,
-  Modal,
-  Picker,
-  Button,
-  Platform,
   TouchableHighlight
 } from 'react-native';
-import styles from './ScoreStyle';
-import {COLOR, MODE, SVG} from './ScoreConstants';
+import GradingModal from './GradingModal';
+import styles from './GradingStyle';
+import {COLOR, MODE, SVG} from './GradingConstants';
 
 const {ACTIVE_COLOR, DEFAULT_COLOR, FONT_COLOR, UNDERLAY_COLOR, DISABLE_COLOR} = COLOR;
 const {BOARD, SMILES, ARCS, STARS} = MODE;
@@ -32,6 +35,7 @@ function polarToCartesian (centerX, centerY, radius, angleInDegrees) {
   };
 }
 
+// generate d attribute value for ART <Shape>
 function generateArcPath (x, y, radius, startAngle, endAngle) {
   var start = polarToCartesian(x, y, radius, startAngle);
   var end = polarToCartesian(x, y, radius, endAngle);
@@ -42,11 +46,10 @@ function generateArcPath (x, y, radius, startAngle, endAngle) {
   ].join(' ');
 }
 
-class Score extends Component {
+class Grading extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
       score: this.props.score
     };
     this.score = 0;
@@ -79,7 +82,7 @@ class Score extends Component {
     };
   }
   moveArc (evt, gestureState) {
-    const {scoreBase, score, onScore} = this.props;
+    const {scoreBase, score, onGrading} = this.props;
     let ds = -gestureState.dy / 300 * scoreBase;
     this.score = ds + score;
     if (this.score > scoreBase) {
@@ -87,7 +90,7 @@ class Score extends Component {
     } else if (this.score < 0) {
       this.score = 0;
     }
-    onScore(this.score);
+    onGrading(this.score);
   }
   noop () { }
   drawSmile(options) {
@@ -113,15 +116,19 @@ class Score extends Component {
   }
   drawArc(options) {
     let {
+      mode,
       activeColor = ACTIVE_COLOR,
       scoreBase = 10,
       scale = 1,
       score,
       fontColor = FONT_COLOR,
       name = '',
-      enable
+      enable,
+      isPercentage
     } = options || {};
     this.score = score;
+    isPercentage = mode === ARCS && isPercentage;
+    if (isPercentage) scoreBase = 100;
     const angle = score / scoreBase * 360;
     let fontStyle = {
       fontSize: 20 * scale,
@@ -157,7 +164,7 @@ class Score extends Component {
             </Group>
           </Surface>
         </View>
-        <Text style={[styles.arcScore, fontStyle]}>{(this.score).toFixed(1)}</Text>
+        <Text style={[styles.arcGrading, fontStyle]}>{isPercentage ? this.score + '%' : (this.score).toFixed(1)}</Text>
         <Text style={nameStyle}>{name}</Text>
       </View>
     );
@@ -167,13 +174,13 @@ class Score extends Component {
       color = ACTIVE_COLOR,
       scale = 1,
       key,
-      onScore = this.noop
+      onGrading = this.noop
     } = options || {};
     return (
       <TouchableHighlight
         key={key}
         underlayColor="transparent"
-        onPress={() => onScore(key)}
+        onPress={() => onGrading(key)}
         >
         <View>
           <Surface width={40 * scale} height={40 * scale}>
@@ -204,19 +211,16 @@ class Score extends Component {
     this.refs.modal.openModal();
   }
   renderArcs () {
-    const {score, scoreBase, onScore} = this.props;
     return (
       <TouchableHighlight
         underlayColor="transparent"
         onPress={this.onPressArc}>
         <View style={styles.arcs}>
           {this.drawArc({...this.props})}
-          {<ScoreModal
+          {<GradingModal
             ref="modal"
-            score={score}
-            scoreBase={scoreBase}
+            {...this.props}
             scored={false}
-            onScore={onScore}
           />}
         </View>
       </TouchableHighlight>
@@ -229,14 +233,14 @@ class Score extends Component {
       scale,
       activeColor,
       defaultColor,
-      onScore,
+      onGrading,
       enable,
       readOnly
     } = this.props;
     let arr = [];
     activeColor = !enable ? DISABLE_COLOR : activeColor;
     defaultColor = !enable ? DEFAULT_COLOR : defaultColor;
-    onScore = enable && !readOnly ? onScore : this.noop;
+    onGrading = enable && !readOnly ? onGrading : this.noop;
     while (scoreBase--) { arr.push(1); }
     return (
       <View style={styles.stars}>
@@ -245,11 +249,11 @@ class Score extends Component {
           this.drawStar({scale: 0.3 * scale,
             color: activeColor,
             key: index + 1,
-            onScore
+            onGrading
           }) : this.drawStar({scale: 0.3 * scale,
             color: defaultColor,
             key: index + 1,
-            onScore
+            onGrading
           })
         )}
       </View>
@@ -258,11 +262,11 @@ class Score extends Component {
   renderSmiles() {
     const {
       isLike,
-      onScore,
+      onGrading,
       enable,
       readOnly
     } = this.props;
-    let onPress = enable && !readOnly ? onScore : this.noop;
+    let onPress = enable && !readOnly ? onGrading : this.noop;
     return (
       <View style={styles.smiles}>
         <TouchableHighlight
@@ -295,7 +299,7 @@ class Score extends Component {
       defaultColor,
       fontColor,
       enable,
-      onScore
+      onGrading
     } = this.props;
     let mainColor = !enable ? DISABLE_COLOR : activeColor;
     let font = !enable ? FONT_COLOR : fontColor;
@@ -306,8 +310,8 @@ class Score extends Component {
         underlayColor={UNDERLAY_COLOR}
         onPress={this.onPressBoard}>
         <View style={styles.board}>
-          <View style={styles.boardScoreWp}>
-            <Text style={[styles.boardScore, {color: mainColor}]}>{(score % BASE).toFixed(1)}</Text>
+          <View style={styles.boardGradingWp}>
+            <Text style={[styles.boardGrading, {color: mainColor}]}>{(score % BASE).toFixed(1)}</Text>
           </View>
           <Text style={[styles.boardNum, {color: font}]}>
             {num < 100000 ? this.parseNumber(num)
@@ -321,12 +325,11 @@ class Score extends Component {
               : this.drawStar({scale: 0.3, color: defaultColor, key: index + 1})
             )}
           </View>
-          {<ScoreModal
+          {<GradingModal
             ref="modal"
-            score={score}
+            {...this.props}
             scoreBase={BASE}
             scored={false}
-            onScore={onScore}
           />}
         </View>
       </TouchableHighlight>
@@ -354,7 +357,7 @@ class Score extends Component {
   }
 }
 
-Score.defaultProps = {
+Grading.defaultProps = {
   mode: 'board',
   enable: true,
   readOnly: false,
@@ -362,16 +365,19 @@ Score.defaultProps = {
   score: 0,
   scoreBase: 5,
   scale: 1,
-  onScore: () => {},
+  onGrading: () => {},
   name: '',
   duration: 200,
   isLike: true,
   activeColor: ACTIVE_COLOR,
   defaultColor: DEFAULT_COLOR,
-  fontColor: FONT_COLOR
+  fontColor: FONT_COLOR,
+  cancelText: 'Cancel',
+  confirmText: 'Confirm',
+  isPercentage: false
 };
 
-Score.propTypes = {
+Grading.propTypes = {
   mode: PropTypes.oneOf([BOARD, ARCS, SMILES, STARS]),
   enable: PropTypes.bool,
   readOnly: PropTypes.bool,
@@ -379,118 +385,20 @@ Score.propTypes = {
   scale: PropTypes.number,
   score: PropTypes.number,
   scoreBase: PropTypes.number,
-  onScore: PropTypes.func,
+  onGrading: PropTypes.func,
   num: PropTypes.number,
   name: PropTypes.string,
-  duration: React.PropTypes.number,
+  isPercentage: PropTypes.bool,
+  duration: PropTypes.number,
   activeColor: PropTypes.string,
   defaultColor: PropTypes.string,
-  fontColor: PropTypes.string
+  fontColor: PropTypes.string,
+  cancelText: PropTypes.string,
+  confirmText: PropTypes.string,
+  cancelTextStyle: PropTypes.object,
+  confirmTextStyle: PropTypes.object,
+  cancelButtonStyle: PropTypes.object,
+  confirmButtonStyle: PropTypes.object
 };
 
-class ScoreModal extends Component {
-  static propTypes = {
-    scored: PropTypes.bool,
-    scoreBase: PropTypes.number,
-    visible: PropTypes.bool,
-    onScore: PropTypes.func,
-    duration: PropTypes.number
-  }
-  static defaultProps = {
-    scored: false,
-    scoreBase: 5,
-    visible: false,
-    duration: 200,
-    onScore: () => {}
-  }
-  constructor (props) {
-    super(props);
-    this.state = {
-      score: this.props.score,
-      isModalVisible: false
-    };
-    this.openModal = this.openModal.bind(this);
-    this.setModalVisible = this.setModalVisible.bind(this);
-    this.onPressCancel = this.onPressCancel.bind(this);
-    this.onPressConfirm = this.onPressConfirm.bind(this);
-  }
-  setModalVisible (isModalVisible) {
-    this.setState({isModalVisible: isModalVisible});
-  }
-  openModal () {
-    this.setModalVisible(true);
-  }
-  onPressCancel () {
-    this.setModalVisible(false);
-  }
-  onPressConfirm () {
-    this.props.onScore(this.state.score);
-    this.setModalVisible(false);
-  }
-  render () {
-    const {scoreBase} = this.props;
-    let selectArr = [];
-    let i = 0;
-    while (i < scoreBase * 10) {
-      i += 1;
-      selectArr.push(i);
-    }
-    selectArr = selectArr.map(item => item / 10);
-    return (
-      <Modal
-        transparent={true}
-        visible={this.state.isModalVisible}
-        onRequestClose={() => {this.setModalVisible(false);}}>
-          <View style={{flex: 1}}>
-            <TouchableHighlight
-              style={styles.modalMask}
-              activeOpacity={1}
-              underlayColor="#00000077"
-              onPress={this.onPressCancel}>
-              <TouchableHighlight
-                underlayColor="#fff"
-                style={styles.modalContainer}>
-                <View style={styles.modal}>
-                  <View>
-                    <Picker
-                      selectedValue={this.state.score}
-                      onValueChange={(value) => !this.props.scored && this.setState({score: value})}>
-                      {selectArr.map(item =>
-                        <Picker.Item label={item.toFixed(1)} value={item} key={item}/>
-                      )}
-                    </Picker>
-                  </View>
-                    {this.props.scored ?
-                      <View style={styles.modalButtons}>
-                        <Button
-                          onPress={this.onPressCancel}
-                          title="您已评价"
-                          color="#888"/>
-                      </View> :
-                      <View style={styles.modalButtons}>
-                        <View style={styles.modalButton}>
-                          <Button
-                            onPress={this.onPressCancel}
-                            title="取消"
-                            color="#888"
-                            />
-                        </View>
-                        <View style={[styles.modalButton, styles.confirmButton]}>
-                          <Button
-                            style={styles.modalButton}
-                            onPress={this.onPressConfirm}
-                            title="确定"
-                            />
-                        </View>
-                      </View>
-                    }
-                </View>
-              </TouchableHighlight>
-            </TouchableHighlight>
-          </View>
-      </Modal>
-    );
-  }
-}
-
-export default Score;
+export default Grading;

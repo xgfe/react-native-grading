@@ -1,5 +1,9 @@
-import {StyleSheet, Dimensions} from 'react-native';
-const {width, height, scale} = Dimensions.get('window');
+/**
+ * Created by TinySymphony on 2016-12-26.
+ * Styles of Grading Component
+ */
+
+import {StyleSheet} from 'react-native';
 
 export default StyleSheet.create({
   board: {
@@ -11,14 +15,14 @@ export default StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#ccc'
   },
-  boardScoreWp: {
+  boardGradingWp: {
     alignItems: 'center',
     width: 62,
     paddingBottom: 2,
     borderBottomWidth: 0.5,
     borderBottomColor: '#ccc'
   },
-  boardScore: {
+  boardGrading: {
     fontSize: 24,
     color: '#fa952f'
   },
@@ -46,40 +50,12 @@ export default StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center'
   },
-  arcScore: {
+  arcGrading: {
     flexDirection: 'row',
     justifyContent: 'center'
   },
   smiles: {
     flexDirection: 'row',
     justifyContent: 'space-around'
-  },
-  modalMask: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#00000077'
-  },
-  modalContainer: {
-  },
-  modal: {
-    height: 251,
-    width: width * 0.6,
-    overflow: 'hidden',
-    borderRadius: 10,
-    backgroundColor: '#fff'
-  },
-  modalButtons: {
-    borderTopWidth: 1 / scale,
-    borderColor: '#c6c6c6',
-    flexDirection: 'row',
-    justifyContent: 'space-around'
-  },
-  modalButton: {
-    width: 120
-  },
-  confirmButton: {
-    borderLeftWidth: 1 / scale,
-    borderColor: '#c6c6c6'
   }
 });

@@ -1,6 +1,6 @@
 {
-  "name": "react-native-score",
-  "version": "0.0.1",
+  "name": "react-native-grading",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "react-native start",
