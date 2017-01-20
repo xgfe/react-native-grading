@@ -6,10 +6,14 @@ react-native-grading is a RN component for users to grade scores. Four modes are
 
 >  There are at least 3 examples for each mode in order to show component in different status. In every test group, the first grading component is enabled, the second one is read only, the third one is disabled.
 
-<a href="#ios-test" id="ios-test"><img src="http://7xjgb0.com1.z0.glb.clouddn.com/ios-grading-test.gif"  align="left" width="200"></a>
+<a href="#ios-test" id="ios-test"><img src="http://7xjgb0.com1.z0.glb.clouddn.com/ios-grading.gif"  align="left" width="200"></a>
 
 
-<a href="#ios" id="ios"><img src="http://7xjgb0.com1.z0.glb.clouddn.com/android-grading-test.gif" width="200"/></a>
+<a href="#ios" id="ios"><img src="http://7xjgb0.com1.z0.glb.clouddn.com/android-grading.gif" width="200"/></a>
+
+
+<p></p>
+
 
 ## Before Using: Link ART in Xcode
 Using this component directly in your project may encounter the following error:

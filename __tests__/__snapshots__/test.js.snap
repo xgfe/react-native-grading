@@ -54,202 +54,252 @@ exports[`test renders grading modal correctly 1`] = `
                   Array [
                     Object {
                       "label": "0.1",
+                      "textColor": undefined,
                       "value": 0.1,
                     },
                     Object {
                       "label": "0.2",
+                      "textColor": undefined,
                       "value": 0.2,
                     },
                     Object {
                       "label": "0.3",
+                      "textColor": undefined,
                       "value": 0.3,
                     },
                     Object {
                       "label": "0.4",
+                      "textColor": undefined,
                       "value": 0.4,
                     },
                     Object {
                       "label": "0.5",
+                      "textColor": undefined,
                       "value": 0.5,
                     },
                     Object {
                       "label": "0.6",
+                      "textColor": undefined,
                       "value": 0.6,
                     },
                     Object {
                       "label": "0.7",
+                      "textColor": undefined,
                       "value": 0.7,
                     },
                     Object {
                       "label": "0.8",
+                      "textColor": undefined,
                       "value": 0.8,
                     },
                     Object {
                       "label": "0.9",
+                      "textColor": undefined,
                       "value": 0.9,
                     },
                     Object {
                       "label": "1.0",
+                      "textColor": undefined,
                       "value": 1,
                     },
                     Object {
                       "label": "1.1",
+                      "textColor": undefined,
                       "value": 1.1,
                     },
                     Object {
                       "label": "1.2",
+                      "textColor": undefined,
                       "value": 1.2,
                     },
                     Object {
                       "label": "1.3",
+                      "textColor": undefined,
                       "value": 1.3,
                     },
                     Object {
                       "label": "1.4",
+                      "textColor": undefined,
                       "value": 1.4,
                     },
                     Object {
                       "label": "1.5",
+                      "textColor": undefined,
                       "value": 1.5,
                     },
                     Object {
                       "label": "1.6",
+                      "textColor": undefined,
                       "value": 1.6,
                     },
                     Object {
                       "label": "1.7",
+                      "textColor": undefined,
                       "value": 1.7,
                     },
                     Object {
                       "label": "1.8",
+                      "textColor": undefined,
                       "value": 1.8,
                     },
                     Object {
                       "label": "1.9",
+                      "textColor": undefined,
                       "value": 1.9,
                     },
                     Object {
                       "label": "2.0",
+                      "textColor": undefined,
                       "value": 2,
                     },
                     Object {
                       "label": "2.1",
+                      "textColor": undefined,
                       "value": 2.1,
                     },
                     Object {
                       "label": "2.2",
+                      "textColor": undefined,
                       "value": 2.2,
                     },
                     Object {
                       "label": "2.3",
+                      "textColor": undefined,
                       "value": 2.3,
                     },
                     Object {
                       "label": "2.4",
+                      "textColor": undefined,
                       "value": 2.4,
                     },
                     Object {
                       "label": "2.5",
+                      "textColor": undefined,
                       "value": 2.5,
                     },
                     Object {
                       "label": "2.6",
+                      "textColor": undefined,
                       "value": 2.6,
                     },
                     Object {
                       "label": "2.7",
+                      "textColor": undefined,
                       "value": 2.7,
                     },
                     Object {
                       "label": "2.8",
+                      "textColor": undefined,
                       "value": 2.8,
                     },
                     Object {
                       "label": "2.9",
+                      "textColor": undefined,
                       "value": 2.9,
                     },
                     Object {
                       "label": "3.0",
+                      "textColor": undefined,
                       "value": 3,
                     },
                     Object {
                       "label": "3.1",
+                      "textColor": undefined,
                       "value": 3.1,
                     },
                     Object {
                       "label": "3.2",
+                      "textColor": undefined,
                       "value": 3.2,
                     },
                     Object {
                       "label": "3.3",
+                      "textColor": undefined,
                       "value": 3.3,
                     },
                     Object {
                       "label": "3.4",
+                      "textColor": undefined,
                       "value": 3.4,
                     },
                     Object {
                       "label": "3.5",
+                      "textColor": undefined,
                       "value": 3.5,
                     },
                     Object {
                       "label": "3.6",
+                      "textColor": undefined,
                       "value": 3.6,
                     },
                     Object {
                       "label": "3.7",
+                      "textColor": undefined,
                       "value": 3.7,
                     },
                     Object {
                       "label": "3.8",
+                      "textColor": undefined,
                       "value": 3.8,
                     },
                     Object {
                       "label": "3.9",
+                      "textColor": undefined,
                       "value": 3.9,
                     },
                     Object {
                       "label": "4.0",
+                      "textColor": undefined,
                       "value": 4,
                     },
                     Object {
                       "label": "4.1",
+                      "textColor": undefined,
                       "value": 4.1,
                     },
                     Object {
                       "label": "4.2",
+                      "textColor": undefined,
                       "value": 4.2,
                     },
                     Object {
                       "label": "4.3",
+                      "textColor": undefined,
                       "value": 4.3,
                     },
                     Object {
                       "label": "4.4",
+                      "textColor": undefined,
                       "value": 4.4,
                     },
                     Object {
                       "label": "4.5",
+                      "textColor": undefined,
                       "value": 4.5,
                     },
                     Object {
                       "label": "4.6",
+                      "textColor": undefined,
                       "value": 4.6,
                     },
                     Object {
                       "label": "4.7",
+                      "textColor": undefined,
                       "value": 4.7,
                     },
                     Object {
                       "label": "4.8",
+                      "textColor": undefined,
                       "value": 4.8,
                     },
                     Object {
                       "label": "4.9",
+                      "textColor": undefined,
                       "value": 4.9,
                     },
                     Object {
                       "label": "5.0",
+                      "textColor": undefined,
                       "value": 5,
                     },
                   ]
