@@ -6,10 +6,10 @@ react-native-grading is a RN component for users to grade scores. Four modes are
 
 >  There are at least 3 examples for each mode in order to show component in different status. In every test group, the first grading component is enabled, the second one is read only, the third one is disabled.
 
-<a href="#ios-test" id="ios-test"><img src="http://7xjgb0.com1.z0.glb.clouddn.com/ios-grading.gif"  align="left" width="200"></a>
+<a href="#ios-test" id="ios-test"><img src="./GIF/ios.gif"  align="left" width="200"></a>
 
 
-<a href="#ios" id="ios"><img src="http://7xjgb0.com1.z0.glb.clouddn.com/android-grading.gif" width="200"/></a>
+<a href="#ios" id="ios"><img src="./GIF/android.gif" width="200"/></a>
 
 
 <p></p>
@@ -113,7 +113,3 @@ Please use refs to invoke the following instance methods.
 | Method | Params | Description |
 | --- | --- | --- |
 | openGradingModal | - | Manually open the grading modal. Enabled in arcs mode and board mode both |
-
-
-
-
