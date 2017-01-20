@@ -1,6 +1,6 @@
 {
   "name": "react-native-grading",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "start": "react-native start",
     "ios": "react-native run-ios",
@@ -33,6 +33,7 @@
     "istanbul": "^0.4.5",
     "jest": "18.0.0",
     "jsdom": "^9.9.1",
+    "react": "^15.4.2",
     "react-addons-test-utils": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-native": "^0.40.0",
