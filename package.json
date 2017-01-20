@@ -1,14 +1,14 @@
 {
   "name": "react-native-grading",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
     "start": "react-native start",
     "ios": "react-native run-ios",
     "android": "react-native run-android",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "cat ./coverage/lcov.info | coveralls"
   },
-  "main": "Score/index.js",
+  "main": "Grading/index.js",
   "author": {
     "name": "wytiny",
     "url": "http://wytiny.com"
@@ -30,8 +30,14 @@
   "devDependencies": {
     "babel-jest": "18.0.0",
     "babel-preset-react-native": "1.9.1",
+    "coveralls": "^2.11.15",
     "cz-conventional-changelog": "^1.2.0",
+    "enzyme": "^2.7.0",
+    "istanbul": "^0.4.5",
     "jest": "18.0.0",
+    "jsdom": "^9.9.1",
+    "react-addons-test-utils": "^15.4.2",
+    "react-dom": "^15.4.2",
     "react-test-renderer": "15.4.1"
   },
   "config": {
@@ -40,6 +46,13 @@
     }
   },
   "jest": {
-    "preset": "react-native"
-  }
+    "preset": "react-native",
+    "verbose": true,
+    "collectCoverage": true,
+    "moduleFileExtensions": [
+      "js",
+      "json"
+    ]
+  },
+  "license": "MIT"
 }

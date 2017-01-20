@@ -12,7 +12,6 @@ import {
   View,
   Modal,
   Picker,
-  Button,
   Platform,
   ScrollView,
   TouchableHighlight
@@ -51,6 +50,7 @@ export default class GradingModal extends Component {
     this.setModalVisible = this.setModalVisible.bind(this);
     this.onPressCancel = this.onPressCancel.bind(this);
     this.onPressConfirm = this.onPressConfirm.bind(this);
+    this.onScrollChange = this.onScrollChange.bind(this);
   }
   setModalVisible (isModalVisible) {
     this.isModalVisible = isModalVisible;
@@ -65,6 +65,14 @@ export default class GradingModal extends Component {
   onPressConfirm () {
     this.props.onGrading(this.state.score);
     this.setModalVisible(false);
+  }
+  onScrollChange (contentWidth, contentHeight) {
+    let posY = ((this.state.score) * 10 - Size.offsetNum) * Size.itemHeight;
+    if (!this.refs.scroll) return;
+    this.refs.scroll.scrollTo({
+      y: posY >= 0 ? posY : 0,
+      x: 0
+    });
   }
   render () {
     let {
@@ -117,13 +125,7 @@ export default class GradingModal extends Component {
                 }
                 {Platform.OS === 'android' &&
                   <View style={styles.modalScroll}>
-                    <ScrollView ref="scroll" onContentSizeChange={(contentWidth, contentHeight) => {
-                      let posY = ((this.state.score) * 10 - Size.offsetNum) * Size.itemHeight;
-                      this.refs.scroll.scrollTo({
-                        y: posY >= 0 ? posY : 0,
-                        x: 0
-                      });
-                    }}>
+                    <ScrollView ref="scroll" onContentSizeChange={this.onScrollChange}>
                     {selectArr.map((item, index) =>
                       <TouchableHighlight
                         activeOpacity={0.5}

@@ -49,48 +49,12 @@ function generateArcPath (x, y, radius, startAngle, endAngle) {
 class Grading extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      score: this.props.score
-    };
-    this.score = 0;
     this.noop = this.noop.bind(this);
     this.renderArcs = this.renderArcs.bind(this);
     this.renderStars = this.renderStars.bind(this);
     this.renderBoard = this.renderBoard.bind(this);
     this.renderSmiles = this.renderSmiles.bind(this);
-    this.onPressBoard = this.onPressBoard.bind(this);
-    this.onPressArc = this.onPressArc.bind(this);
-  }
-  throttle(fn, time) {
-    let running = false;
-    let isFrame = false;
-    if (!time) isFrame = true;
-    const getCallback = (self, args) => {
-      return () => {
-        fn.apply(self, args);
-        running = false;
-      };
-    };
-    return function () {
-      if (running) return;
-      running = true;
-      if (isFrame) {
-        window.requestAnimationFrame(getCallback(this, arguments));
-      } else {
-        setTimeout(getCallback(this, arguments), time);
-      }
-    };
-  }
-  moveArc (evt, gestureState) {
-    const {scoreBase, score, onGrading} = this.props;
-    let ds = -gestureState.dy / 300 * scoreBase;
-    this.score = ds + score;
-    if (this.score > scoreBase) {
-      this.score = scoreBase;
-    } else if (this.score < 0) {
-      this.score = 0;
-    }
-    onGrading(this.score);
+    this.openGradingModal = this.openGradingModal.bind(this);
   }
   noop () { }
   drawSmile(options) {
@@ -126,7 +90,6 @@ class Grading extends Component {
       enable,
       isPercentage
     } = options || {};
-    this.score = score;
     isPercentage = mode === ARCS && isPercentage;
     if (isPercentage) scoreBase = 100;
     const angle = score / scoreBase * 360;
@@ -164,7 +127,7 @@ class Grading extends Component {
             </Group>
           </Surface>
         </View>
-        <Text style={[styles.arcGrading, fontStyle]}>{isPercentage ? this.score + '%' : (this.score).toFixed(1)}</Text>
+        <Text style={[styles.arcGrading, fontStyle]}>{isPercentage ? score + '%' : score.toFixed(1)}</Text>
         <Text style={nameStyle}>{name}</Text>
       </View>
     );
@@ -205,7 +168,7 @@ class Grading extends Component {
     }
     return arr.join();
   }
-  onPressArc () {
+  openGradingModal () {
     const {readOnly, enable} = this.props;
     if (readOnly || !enable) return;
     this.refs.modal.openModal();
@@ -214,7 +177,7 @@ class Grading extends Component {
     return (
       <TouchableHighlight
         underlayColor="transparent"
-        onPress={this.onPressArc}>
+        onPress={this.openGradingModal}>
         <View style={styles.arcs}>
           {this.drawArc({...this.props})}
           {<GradingModal
@@ -286,11 +249,6 @@ class Grading extends Component {
       </View>
     );
   }
-  onPressBoard () {
-    const {enable, readOnly} = this.props;
-    if (!enable || readOnly) return;
-    this.refs.modal.openModal();
-  }
   renderBoard() {
     const {
       score,
@@ -298,8 +256,7 @@ class Grading extends Component {
       activeColor,
       defaultColor,
       fontColor,
-      enable,
-      onGrading
+      enable
     } = this.props;
     let mainColor = !enable ? DISABLE_COLOR : activeColor;
     let font = !enable ? FONT_COLOR : fontColor;
@@ -308,7 +265,7 @@ class Grading extends Component {
     return (
       <TouchableHighlight
         underlayColor={UNDERLAY_COLOR}
-        onPress={this.onPressBoard}>
+        onPress={this.openGradingModal}>
         <View style={styles.board}>
           <View style={styles.boardGradingWp}>
             <Text style={[styles.boardGrading, {color: mainColor}]}>{(score % BASE).toFixed(1)}</Text>
@@ -367,7 +324,6 @@ Grading.defaultProps = {
   scale: 1,
   onGrading: () => {},
   name: '',
-  duration: 200,
   isLike: true,
   activeColor: ACTIVE_COLOR,
   defaultColor: DEFAULT_COLOR,
@@ -389,7 +345,6 @@ Grading.propTypes = {
   num: PropTypes.number,
   name: PropTypes.string,
   isPercentage: PropTypes.bool,
-  duration: PropTypes.number,
   activeColor: PropTypes.string,
   defaultColor: PropTypes.string,
   fontColor: PropTypes.string,
